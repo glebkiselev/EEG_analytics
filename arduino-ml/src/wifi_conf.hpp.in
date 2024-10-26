@@ -1,0 +1,7 @@
+#ifndef WIFI_CONF_HPP
+#define WIFI_CONF_HPP
+
+#define WIFI_AP_SSID "@WIFI_SSID@"
+#define WIFI_AP_PASSWORD "@WIFI_PASSWD@"
+
+#endif // WIFI_CONF_HPP
