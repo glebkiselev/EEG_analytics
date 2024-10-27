@@ -55,6 +55,7 @@ void web::setup() {
 }
 
 void web::ctxPredict() {
+    setLedState(true);
     try {
         auto* x = new float[24];
         for (int i = 0; i < 24; i++) {
@@ -63,6 +64,7 @@ void web::ctxPredict() {
 
             if (!server.hasArg(xIdx)) {
                 server.send(400, "text/plain", "Insufficient x parameter(s)");
+                setLedState(false);
                 return;
             }
 
@@ -83,6 +85,7 @@ void web::ctxPredict() {
     } catch (const std::exception& ex) {
         server.send(500, "text/plain", ex.what());
     }
+    setLedState(false);
 }
 
 void web::setLedState(const bool state) {

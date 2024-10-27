@@ -41,6 +41,13 @@ void ml::setup() {
     input = interpreter->input(0);
     output = interpreter->output(0);
 
+    if (input->dims->size != 2 || input->dims->data[0] != 1 || input->dims->data[1] != 24) {
+        throw std::runtime_error("Unexpected input tensor shape, expected [1, 24]");
+    }
+    if (output->dims->size != 2 || output->dims->data[0] != 1 || output->dims->data[1] != 4) {
+        throw std::runtime_error("Unexpected output tensor shape, expected [1, 4]");
+    }
+
     cout << "TFLite done." << endl;
 }
 
