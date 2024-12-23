@@ -72,6 +72,11 @@ void web::ctxPredict() {
             x[i] = xStr.toFloat();
         }
         const float* y = ml::inference(x);
+
+        // Binary classification
+        // const auto result = String(y[0]);
+
+        // Multi-label classification
         auto result = String("");
         bool first = true;
         for (int i = 0; i < 4; i++) {
@@ -81,6 +86,7 @@ void web::ctxPredict() {
                 result.concat(" ");
             result.concat(y[i]);
         }
+
         server.send(200, "text/plain", result);
     } catch (const std::exception& ex) {
         server.send(500, "text/plain", ex.what());
