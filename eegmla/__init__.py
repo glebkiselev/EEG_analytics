@@ -28,20 +28,23 @@ class ExperimentalArduinoApi:
         with open(labels_path, 'rb') as f:
             self.le: LabelEncoder = pkl.load(f)
 
-    def predict(self, *x: float) -> Tuple[float, float, float, float]:
+    def predict(self, *x: float, blink=False) -> Tuple[float, float, float, float]:
         """
         Predict single sample.
         :param x: 24-features value of single sample (arg count == 24)
+        :param blink: Do blink on the controller based on the output.
+        Slows down the execution time by 0.6 - 0.6 * n seconds
         :return: n-class probability tuple (n float tuple)
         :raises HTTP errors: 4xx, 5xx, connection issues. 400 error raises ValueError.
         """
         x = list(x)
         x = pd.DataFrame([pd.Series(data=x, index=[f'Channel {i + 1:d}' for i in range(len(x))])])
         x = self.sc.transform(x)[0]
-        resp = requests.get(f'http://{self.host}/predict', params={
-            f'x{idx + 1}': float(xi)
-            for idx, xi in enumerate(x)
-        })
+
+        params = {f'x{idx + 1}': float(xi) for idx, xi in enumerate(x)}
+        if blink: params['blink'] = 1
+
+        resp = requests.get(f'http://{self.host}/predict', params=params)
         if resp.status_code == 400:
             raise ValueError('Invalid input arguments. Detail: ' + resp.text)
         resp.raise_for_status()
@@ -57,7 +60,7 @@ class ExperimentalArduinoApi:
         Tests the connection by predicting a hardcoded sample.
         No error raised means that the test passed.
         :return: The test sample's result
-        :raises Exception, detailing the test fault
+        :raises Exception detailing the test fault
         """
         result = self.predict(
             -0.52109855, -0.57133687, -0.481523, -0.5882358, -0.80570453, -0.03607523,

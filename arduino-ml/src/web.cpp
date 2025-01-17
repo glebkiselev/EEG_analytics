@@ -75,16 +75,39 @@ void web::ctxPredict() {
 
         // Binary classification
         // const auto result = String(y[0]);
+        // const int max = y[0] > .5f ? 1 : 0;
 
         // Multi-label classification
         auto result = String("");
         bool first = true;
+        float yi;
+        float maxVal = -1.f;
+        int max = 0;
         for (int i = 0; i < 4; i++) {
             if (first)
                 first = false;
             else
                 result.concat(" ");
-            result.concat(y[i]);
+            yi = y[i];
+            result.concat(yi);
+            if (yi > maxVal) {
+                maxVal = yi;
+                max = i;
+            }
+        }
+
+        if (server.hasArg("blink")) {
+            const String enableBlink = server.arg("blink");
+            const uint8_t enableBlinkInt = enableBlink.toInt();
+            if (enableBlinkInt) {
+                setLedState(false);
+                for (int i = 0; i <= max; i++) {
+                    delay(400);
+                    setLedState(true);
+                    delay(200);
+                    setLedState(false);
+                }
+            }
         }
 
         server.send(200, "text/plain", result);
